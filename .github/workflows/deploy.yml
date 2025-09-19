@@ -1,0 +1,22 @@
+name: Despliegue Automatico en AWS EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. Conexión y despliegue en el servidor
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          cd ~/mi-api-automatizada
+          git pull origin main
+          npm install --production
+          pm2 restart mi-api || pm2 start index.js --name "mi-api"
